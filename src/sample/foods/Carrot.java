@@ -10,26 +10,15 @@ import sample.SpriteAnimation;
 import sample.controllers.PetController;
 import sample.pets.Pet;
 
-public abstract class Food extends Pane {
-
-    protected int count = 4;
-    protected int columns = 4;
-    protected int offsetX = 0;
-    protected int offsetY = 0;
-    protected int width = (int)(32*1.5);
-    protected int height = (int)(32*1.5);
-    protected SpriteAnimation animation;
-
-    protected Image image;
+public class Carrot extends Food {
+    protected Image image = new Image(getClass().getResourceAsStream("../resources/sprites/carrot.png"), count*width, height, false, true);
     protected ImageView imageView = new ImageView(image);
 
-    public Food(Pet pet, PetController petController) {
+    public Carrot(Pet pet, PetController petController) {
+        super(pet, petController);
         this.imageView.setViewport(new Rectangle2D(offsetX, offsetY, width, height));
         animation = new SpriteAnimation(imageView, Duration.millis(count*100*3), count, columns, offsetX, offsetY, width, height, false);
-        getChildren().addAll(imageView);
-
-        this.setTranslateY(300-height);
-        this.setPrefSize(width, height);
+        this.getChildren().addAll(imageView);
 
         this.animation.setOnFinished(event -> {
             petController.root.getChildren().remove(this);
@@ -39,9 +28,4 @@ public abstract class Food extends Pane {
             petController.checkChanges();
         });
     }
-
-    public void destroy(){
-        this.animation.play();
-    }
 }
-

@@ -11,28 +11,37 @@ import sample.foods.Food;
 
 import java.util.Date;
 
-public class Pet extends Pane {
+public abstract class Pet extends Pane {
+
+    //Период изменения роста питомца
+    protected final int GROW_PERIOD = 6 * 60 * 60 * 1000;
+    //Период изменения настроения питомца
+    protected final int MOOD_PERIOD = 60 * 60 * 1000;
 
     //Параметры питомца
-    private String name;
-    private double grown;
+    protected String name;
+    protected double grown;
+    protected String favoriteFood;
 
     //Для анимации
-    private int count = 4;
-    private int columns = 4;
-    private int offsetX = 0;
-    private int offsetY = 0;
-    private int width = (int)(32 * grown);
-    private int height = (int)(32 * grown);
-    private SpriteAnimation animation;
-    private Image image = new Image(getClass().getResourceAsStream("../resources/sprites/cat.png"), count * width, 2 * height, false, true);
-    private ImageView imageView = new ImageView(image);
+    protected int count = 4;
+    protected int columns = 4;
+    protected int offsetX = 0;
+    protected int offsetY = 0;
+    protected int width = (int)(32 * grown);
+    protected int height = (int)(32 * grown);
+    protected SpriteAnimation animation;
+    protected String imgPath = "";
+    protected Image image = new Image(getClass().getResourceAsStream(imgPath), count * width, 2 * height, false, true);
+    protected ImageView imageView = new ImageView(image);
 
     //Вспомогательные переменные для бизнес-логики
-    private int steps = 0;
-    private boolean isEating = false;
+    protected int steps = 0;
+    protected boolean isEating = false;
 
     public Pet(String name) {
+        this.name = name;
+
         this.imageView.setViewport(new Rectangle2D(offsetX, offsetY, width, height));
         animation = new SpriteAnimation(imageView, Duration.millis(count * 100), count, columns, offsetX, offsetY, width, height, true);
         getChildren().addAll(imageView);
@@ -91,7 +100,7 @@ public class Pet extends Pane {
     }
 
     //Проигрывает анимацию хотьбы и сдвигает питомца на 1 пиксель в указанном направлении
-    private void stepTo(boolean right) {
+    protected void stepTo(boolean right) {
         this.animation.play();
 
         if (right) {
@@ -104,7 +113,7 @@ public class Pet extends Pane {
     }
 
     //Генерирует координаты прогулки питомца
-    private void wantsToGo(int widthWalkingArea) {
+    protected void wantsToGo(int widthWalkingArea) {
         int newSteps = (int) ((Math.random() * widthWalkingArea) - widthWalkingArea / 2);
 
         int petsLeftBorder = this.translateXProperty().intValue();
@@ -124,20 +133,20 @@ public class Pet extends Pane {
     //Метод возвращает значение для ProgressBar, который является индикатором настроения питомца
     public double myMoodIs() {
         Date now = new Date(System.currentTimeMillis());
-        long hoursFromFeeding = (now.getTime() - Saver.dateFeed.getTime()) / (5 * 1000);
+        long hoursFromFeeding = (now.getTime() - Saver.dateFeed.getTime()) / (MOOD_PERIOD);
         return (double) (12-hoursFromFeeding)/12;
     }
 
     public void growUp(){
         Date now = new Date(System.currentTimeMillis());
-        long hoursFromBorn = (now.getTime() - Saver.dateCreate.getTime()) / (60 * 60 * 1000);
+        long hoursFromBorn = (now.getTime() - Saver.dateCreate.getTime()) / (GROW_PERIOD);
 
         //Каждые 6 часов питомец вырастает (максимум 5 раз)
-        if (hoursFromBorn >= 6*5) grown = 3;
-        else if (hoursFromBorn >= 6*4) grown = 2.8;
-        else if (hoursFromBorn >= 6*3) grown = 2.6;
-        else if (hoursFromBorn >= 6*2) grown = 2.4;
-        else if (hoursFromBorn >= 6) grown = 2.2;
+        if (hoursFromBorn >= 5) grown = 3;
+        else if (hoursFromBorn >= 4) grown = 2.8;
+        else if (hoursFromBorn >= 3) grown = 2.6;
+        else if (hoursFromBorn >= 2) grown = 2.4;
+        else if (hoursFromBorn >= 1) grown = 2.2;
         else grown = 2;
 
         //Если питомец подрос, увеличиваем его текстурку
@@ -145,7 +154,7 @@ public class Pet extends Pane {
             getChildren().removeAll(imageView);
             width = (int)(32 * grown);
             height = (int)(32 * grown);
-            image = new Image(getClass().getResourceAsStream("../resources/sprites/cat.png"), count * width, 2 * height, false, true);
+            image = new Image(getClass().getResourceAsStream(imgPath), count * width, 2 * height, false, true);
             imageView = new ImageView(image);
             imageView.setViewport(new Rectangle2D(offsetX, offsetY, width, height));
             animation = new SpriteAnimation(imageView, Duration.millis(count * 100), count, columns, offsetX, offsetY, width, height, true);
@@ -165,5 +174,9 @@ public class Pet extends Pane {
 
     public String getName() {
         return name;
+    }
+
+    public String getFavoriteFood() {
+        return favoriteFood;
     }
 }

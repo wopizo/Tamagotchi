@@ -37,12 +37,11 @@ public class SpriteAnimation  extends Transition{
         this.imageView.setViewport(new Rectangle2D(offsetX, offsetY, width, height));
 
     }
-//    public void setOffsetX(int x){
-//        this.offsetX = x;
-//    }
+
     public void setOffsetY(int y){
         this.offsetY = y;
     }
+
     protected void interpolate(double frac) {
         final int index = Math.min((int)Math.floor(count*frac), count-1);
         final int x = (index%columns)*width+offsetX;
